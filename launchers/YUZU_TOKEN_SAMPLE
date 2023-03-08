@@ -1,0 +1,5 @@
+# I haven't figure out how to get the token but you should be able to get one from metadata.json created by the official launcher
+# rename the file to .yuzu_token after you finished editing the following two fields
+
+export X_USERNAME="your username"
+export X_TOKEN="the token"
