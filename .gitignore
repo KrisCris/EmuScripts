@@ -1,3 +1,4 @@
+logs
 *.log
-.yuzu_token
+.*_token
 .DS_Store
