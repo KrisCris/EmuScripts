@@ -39,7 +39,7 @@ check_for_updates() {
                 log "Successfully downloaded"
                 # Move the old executable only when curl completes successfully
                 if [[ -f "$exe" ]]; then
-                    mv "$exe" "$EMU_FOLDER/yuzu.bk.AppImage"
+                    rm "$exe"
                 fi
                 log "Updated!"
                 exe="$new_exe"
