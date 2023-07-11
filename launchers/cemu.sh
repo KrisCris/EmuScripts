@@ -1,11 +1,14 @@
 #!/bin/sh
-emuName="cemu"
-emufolder="$HOME/Applications"
+EMU_NAME="cemu"
+EMU_FOLDER="$HOME/Applications"
 
-exe=$(find $emufolder -iname "${emuName}*.AppImage")
+LOGGER="../tools/logger.sh"
+source "$LOGGER"
+
+exe=$(find $EMU_FOLDER -iname "${EMU_NAME}*.AppImage")
 
 chmod +x "$exe"
 
-echo "$exe ${@}" > "cemu.log"
+log "Launching \"${@}\" with executable \"$exe\""
 
 "$exe" "${@}"
