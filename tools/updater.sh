@@ -51,6 +51,8 @@ update_from_github() {
         local metaData=$(curl -fSs ${host})
         local fileToDownload=$(echo ${metaData} | jq -r '.assets[] | select(.name|test(".*.AppImage$")).browser_download_url')
         local newExe=$(echo ${metaData} | jq -r '.assets[] | select(.name|test(".*.AppImage$")).name')
+        log "LATEST VERSION:  $newExe"
+        log "CURRENT VERSION: $currentExe"
         if [ "$newExe" = "$currentExe" ] ;then
             log "no need to update."
         elif [ -z "$newExe" ] ;then
@@ -76,8 +78,9 @@ update_yuzu_ea() {
         local exe_name=$(basename "$EXE")
         local latest_url=$(curl -s "$YUZU_EA_API_VERSIONS" | grep -m 1 -io 'https.*AppImage')
         local latest_name=$(echo "$latest_url" | grep -m 1 -io 'yuzu-early-access.*AppImage')
-
-        if [[ "$latest_name" != "$EXE_name" ]]; then
+        log "LATEST VERSION:  $latest_name"
+        log "CURRENT VERSION: $exe_name"
+        if [[ "$latest_name" != "$exe_name" ]]; then
             log "New version \"$latest_name\" found!"
             zenity --question --title="Yuzu update available!" --width 200 --text "Yuzu ${currentVer} available. Would you like to update?" --ok-label="Yes" --cancel-label="No" 2>/dev/null
             if [ $? = 0 ]; then

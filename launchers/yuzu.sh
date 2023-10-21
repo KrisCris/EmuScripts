@@ -13,7 +13,7 @@ launch_yuzu() {
     fi
 
     chmod +x "$EXE"
-    log "Launching \"${@}\" with EXEcutable \"$EXE\""
+    log "Launching \"$EXE\" with params: \"${@}\""
     "$EXE" "${@}"
 }
 

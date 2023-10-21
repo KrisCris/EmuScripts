@@ -9,6 +9,6 @@ exe=$(find $EMU_FOLDER -iname "${EMU_NAME}*.AppImage")
 
 chmod +x "$exe"
 
-log "Launching \"${@}\" with executable \"$exe\""
+log "Launching \"$exe\" with params: \"${@}\""
 
 "$exe" "${@}"

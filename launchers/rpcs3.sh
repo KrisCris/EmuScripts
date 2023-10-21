@@ -6,12 +6,12 @@ source "$LOGGER"
 
 launch() {
     if [[ -z "$EXE" ]]; then
-        log "No EXEcutable found, exiting"
+        log "No Executable found, exiting"
         exit 1
     fi
 
     chmod +x "$EXE"
-    log "Launching \"${@}\" with EXEcutable \"$EXE\""
+    log "Launching \"$EXE\" with params: \"${@}\""
     "$EXE" "${@}"
 }
 
