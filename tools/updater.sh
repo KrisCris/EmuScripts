@@ -1,6 +1,7 @@
 set +e
 check_internet() {
-    if : >/dev/tcp/8.8.8.8/53; then
+    curl "1.1.1.1"
+    if [[ $? -eq 0 ]]; then
         log 'Internet available. Check for Update'
         return 0
     fi
@@ -46,24 +47,25 @@ safeDownload() {
 
 update_from_github() {
     if check_internet; then
-        local currentExe=$1
+        local current_name=$1
         local host=$2
         local metaData=$(curl -fSs ${host})
         local fileToDownload=$(echo ${metaData} | jq -r '.assets[] | select(.name|test(".*.AppImage$")).browser_download_url')
-        local newExe=$(echo ${metaData} | jq -r '.assets[] | select(.name|test(".*.AppImage$")).name')
-        log "LATEST VERSION:  $newExe"
-        log "CURRENT VERSION: $currentExe"
-        if [ "$newExe" = "$currentExe" ] ;then
+        local latest_name=$(echo ${metaData} | jq -r '.assets[] | select(.name|test(".*.AppImage$")).name')
+        log "LATEST VERSION:  $latest_name"
+        log "CURRENT VERSION: $current_name"
+
+        if [ "$latest_name" = "$current_name" ]; then
             log "no need to update."
-        elif [ -z "$newExe" ] ;then
+        elif [ -z "$latest_name" ]; then
             log "couldn't get metadata."
         else
-            zenity --question --title="Update available!" --width 200 --text "Version ${newExe} available. Would you like to update?" --ok-label="Yes" --cancel-label="No" 2>/dev/null
+            zenity --question --title="Update available!" --width 450 --text "Update Available!\nCurrentVer: ${current_name}\nLatestVer: ${latest_name}\nWould you like to upgrade?" --ok-label="Yes" --cancel-label="No" 2>/dev/null
             if [ $? = 0 ]; then
-                log "download ${newExe} appimage to $EMU_FOLDER/$newExe"
-                if safeDownload "$EMU_FOLDER/$newExe" "${fileToDownload}" "1"; then
-                    rm "$EMU_FOLDER/$currentExe"
-                    export EXE="$EMU_FOLDER/$newExe"
+                log "download ${latest_name} appimage to $EMU_FOLDER/$latest_name"
+                if safeDownload "$EMU_FOLDER/$latest_name" "${fileToDownload}" "1"; then
+                    rm "$EMU_FOLDER/$current_name"
+                    export EXE="$EMU_FOLDER/$latest_name"
                 else
                     log "Error updating $EMU_NAME!"
                     zenity --error --text "Error updating $EMU_NAME!" --width=250 2>/dev/null
@@ -75,14 +77,18 @@ update_from_github() {
 
 update_yuzu_ea() {
     if check_internet; then
-        local exe_name=$(basename "$EXE")
+        local current_name=$(basename "$EXE")
         local latest_url=$(curl -s "$YUZU_EA_API_VERSIONS" | grep -m 1 -io 'https.*AppImage')
         local latest_name=$(echo "$latest_url" | grep -m 1 -io 'yuzu-early-access.*AppImage')
         log "LATEST VERSION:  $latest_name"
-        log "CURRENT VERSION: $exe_name"
-        if [[ "$latest_name" != "$exe_name" ]]; then
+        log "CURRENT VERSION: $current_name"
+        if [ -z $latest_name ]; then
+            log "No new version find..."
+            return 1
+        fi
+        if [[ "$latest_name" != "$current_name" ]]; then
             log "New version \"$latest_name\" found!"
-            zenity --question --title="Yuzu update available!" --width 200 --text "Yuzu ${currentVer} available. Would you like to update?" --ok-label="Yes" --cancel-label="No" 2>/dev/null
+            zenity --question --title="Update available!" --width 450 --text "Update Available!\nCurrentVer: ${current_name}\nLatestVer: ${latest_name}.\nWould you like to upgrade?" --ok-label="Yes" --cancel-label="No" 2>/dev/null
             if [ $? = 0 ]; then
                 local auth_response=$(curl -s -w "HTTPSTATUS:%{http_code}" --header "X-USERNAME: $X_USERNAME" --header "X-TOKEN: $X_TOKEN" --header "User-Agent: $User_Agent" -X POST "$YUZU_EA_API_AUTH")
                 local auth_status=$(echo "$auth_response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
