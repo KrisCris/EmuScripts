@@ -3,7 +3,6 @@ set +e
 run() {
     local exe_path="$1"
     shift
-    local launcher_params="$@"
 
     if [[ -z "$exe_path" ]]; then
         log "No executable found, exiting"
@@ -11,6 +10,6 @@ run() {
     fi
 
     chmod +x "$exe_path"
-    log "Launching \"$exe_path\" with params: \"$launcher_params\""
-    "$exe_path" "$launcher_params"
+    log "Launching \"$exe_path\" with params: \"${@}\""
+    "$exe_path" "${@}"
 }
