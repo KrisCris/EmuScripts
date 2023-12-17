@@ -1,6 +1,6 @@
 set +e
 check_internet() {
-    curl "1.1.1.1"
+    curl "$1"
     if [[ $? -eq 0 ]]; then
         log 'Internet available. Check for Update'
         return 0
@@ -46,9 +46,9 @@ safeDownload() {
 }
 
 update_from_github() {
-    if check_internet; then
-        local current_name=$1
-        local host=$2
+    local current_name=$1
+    local host=$2
+    if check_internet "$host"; then
         local metaData=$(curl -fSs ${host})
         local fileToDownload=$(echo ${metaData} | jq -r '.assets[] | select(.name|test(".*.AppImage$")).browser_download_url')
         local latest_name=$(echo ${metaData} | jq -r '.assets[] | select(.name|test(".*.AppImage$")).name')
@@ -76,9 +76,11 @@ update_from_github() {
 }
 
 update_yuzu_ea() {
-    if check_internet; then
-        local current_name=$(basename "$EXE")
-        local latest_url=$(curl -s "$YUZU_EA_API_VERSIONS" | grep -m 1 -io 'https.*AppImage')
+    local current_name="$1"
+    local url_version="$2"
+    local url_auth="$3"
+    if check_internet "$url_version"; then
+        local latest_url=$(curl -s "$url_version" | grep -m 1 -io 'https.*AppImage')
         local latest_name=$(echo "$latest_url" | grep -m 1 -io 'yuzu-early-access.*AppImage')
         log "LATEST VERSION:  $latest_name"
         log "CURRENT VERSION: $current_name"
@@ -90,7 +92,7 @@ update_yuzu_ea() {
             log "New version \"$latest_name\" found!"
             zenity --question --title="Update available!" --width 450 --text "Update Available!\nCurrentVer: ${current_name}\nLatestVer: ${latest_name}.\nWould you like to upgrade?" --ok-label="Yes" --cancel-label="No" 2>/dev/null
             if [ $? = 0 ]; then
-                local auth_response=$(curl -s -w "HTTPSTATUS:%{http_code}" --header "X-USERNAME: $X_USERNAME" --header "X-TOKEN: $X_TOKEN" --header "User-Agent: $User_Agent" -X POST "$YUZU_EA_API_AUTH")
+                local auth_response=$(curl -s -w "HTTPSTATUS:%{http_code}" --header "X-USERNAME: $X_USERNAME" --header "X-TOKEN: $X_TOKEN" --header "User-Agent: $User_Agent" -X POST "$url_auth")
                 local auth_status=$(echo "$auth_response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
                 local auth_token=$(echo "$auth_response" | sed -e 's/HTTPSTATUS:.*//g')
                 log "Authenticating user \"$X_USERNAME\""

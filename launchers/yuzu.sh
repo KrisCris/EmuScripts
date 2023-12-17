@@ -5,7 +5,11 @@ LAUNCHER="../tools/launcher.sh"
 
 EMU_NAME="yuzu"
 EMU_FOLDER="$HOME/Applications"
-EXE=$(find "$EMU_FOLDER" -iname "$EMU_NAME*.AppImage")
+EXE="$(find "$EMU_FOLDER" -iname "$EMU_NAME*.AppImage")"
+
+YUZU_EA="https://api.yuzu-emu.org/downloads/earlyaccess/"
+YUZU_EA_API_AUTH="https://api.yuzu-emu.org/jwt/installer/"
+YUZU_MAINLINE="https://api.github.com/repos/yuzu-emu/yuzu-mainline/releases/latest"
 
 source "$LOGGER"
 source "$UPDATER"
@@ -27,14 +31,12 @@ if [[ "$1" == "--ea" ]]; then
     source "$yuzu_token"
 
     User_Agent="liftinstall (j-selby)"
-    YUZU_EA_API_VERSIONS="https://api.yuzu-emu.org/downloads/earlyaccess/"
-    YUZU_EA_API_AUTH="https://api.yuzu-emu.org/jwt/installer/"
-    update_yuzu_ea
+
+    update_yuzu_ea "$(basename $EXE)" "$YUZU_EA" "$YUZU_EA_API_AUTH" 
     shift
 else
     log "using yuzu mainline"
-    UPDATE_HOST="https://api.github.com/repos/yuzu-emu/yuzu-mainline/releases/latest"
-    update_from_github "$(basename $EXE)" "$UPDATE_HOST"
+    update_from_github "$(basename $EXE)" "$YUZU_MAINLINE"
 fi
 
 run "$EXE" "${@}"
