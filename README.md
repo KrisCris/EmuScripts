@@ -1,10 +1,16 @@
-# My Experimental Emulator Launching Scripts
+# My Emulator Launching Scripts for the Deck
+
+---
+
+# ALRIGHT, FUCK NINTENDO.
+
+---
 
 ## WHY
 
-I don't need the amount of scripts and emulators bundled by emudeck, so I started learning bash scripting and writing it by myself
+I don't need the amount of scripts and emulators bundled by emudeck, so I code a simple version myself.
 
-Did I add any new features? Idk, I am too lazy these days to even play steam deck LOL.
+how to use? just point the executables to the launchers/xxxx.sh in steamgridmanager.
 
 ## Credit
 
