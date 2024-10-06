@@ -109,6 +109,9 @@ update_yuzu_ea() {
                         log "Error updating $EMU_NAME!"
                         zenity --error --text "Error updating $EMU_NAME!" --width=250 2>/dev/null
                     fi
+                elif [[ "$auth_status" = "500" ]]; then
+                    zenity --error --text "Internal Server Error, Try Again Later!" --width=250 2>/dev/null
+                    log "Internal Server Error, Try Again Later!"
                 else
                     zenity --error --text "Invalid Yuzu username or token!" --width=250 2>/dev/null
                     log "Invalid Yuzu username or token, skipping update"

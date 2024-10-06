@@ -1,8 +1,0 @@
-# replace the token string with the one on your yuzu profile page (https://profile.yuzu-emu.org/).
-YUZU_TOKEN="dXNlcm5hbWU6MTExMTExMS0yMjIyLTMzMzMtNDQ0NDQ0NDQ0NDQ0Cg"
-
-# You shouldn't touch the rest of the code.
-atob="$(echo "$YUZU_TOKEN"==== | fold -w 4 | sed '$ d' | tr -d '\n' | base64 --decode 2>/dev/null)"
-IFS=':' read -ra output <<< "$atob"
-export X_TOKEN=${output[1]}
-export X_USERNAME=${output[0]}
