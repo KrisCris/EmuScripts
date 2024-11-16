@@ -7,6 +7,10 @@ source "$LOGGER"
 parse_arguments() {
     while [[ $# -gt 0 ]]; do
         case $1 in
+            --local-addr)
+                LOCAL_ADDR="$2"
+                shift 2
+                ;;
             --home)
                 HOME_IP="$2"
                 shift 2
@@ -43,10 +47,10 @@ resolve_remote_ip() {
     ping -4 -c 1 "$REMOTE_HOST" | head -n 1 | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | head -n 1
 }
 
-# Function to check if HOME_IP matches any of the current IPs
+# Function to check if LOCAL_ADDR matches any of the current IPs
 check_home_ip_match() {
     for ip in $CURRENT_IPS; do
-        if [[ "$ip" == "$HOME_IP" ]]; then
+        if [[ "$ip" == "$LOCAL_ADDR" ]]; then
             return 0  # Match found
         fi
     done
@@ -54,18 +58,20 @@ check_home_ip_match() {
 }
 
 # Main logic
+log "Args: $@"
 parse_arguments "$@"
 
 # Ensure mandatory parameters are provided
 if [[ -z "$HOME_IP" || -z "$REMOTE_HOST" ]]; then
-    log "Usage: $0 --home=<home_ip> --remote=<remote_domain_or_ip> [other_parameters...]"
+    log "Usage: $0 --local-addr=<local_addr> --home=<home_ip> --remote=<remote_domain_or_ip> [other_parameters...]"
     exit 1
 fi
 
 CURRENT_IPS=$(get_current_ips)
+log "IPs: $CURRENT_IPS"
 
 if check_home_ip_match; then
-    log "Current IP matches home IP ($HOME_IP). Performing home action..."
+    log "Current IP matches home local addr ($LOCAL_ADDR). Performing home action..."
     FINAL_IP=$HOME_IP
 else
     if is_ipv4 "$REMOTE_HOST"; then
